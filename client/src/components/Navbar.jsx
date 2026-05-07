@@ -1,143 +1,232 @@
-import { Link, NavLink } from "react-router-dom"
-import { useContext, useState } from "react"
-import { UserContext } from "../context/UserContext"
-import Loader from "./Loader"
+import { Link, NavLink } from "react-router-dom";
+import { useContext, useState } from "react";
+import { UserContext } from "../context/UserContext";
+import Loader from "./Loader";
+import { FaArrowRight } from "react-icons/fa";
 
 function Navbar() {
-  const [isOpen, setIsOpen] = useState(false)
-  const { user, logout, loading } = useContext(UserContext)
+  const [openAside, setOpenAside] = useState(false);
+  const { user, logout } = useContext(UserContext);
+  const [openModal, setOpenModal] = useState(false)
 
-  if (loading) {
-    return <Loader/>
-  }
 
-  if (!user || user.role === 'jobseeker') {
-
-    return (
+  return (
+    <>
       <nav className="w-full py-4 shadow-lg fixed bg-teal-700/90 top-0 left-0 z-40">
 
         {/* MOBILE MENU */}
-        <div className={`fixed top-0 left-0 h-full w-[18rem] bg-white transform ${isOpen ? "translate-x-0" : "-translate-x-full"
-          } transition duration-300 z-50 p-6`}>
+        <div
+          className={`fixed top-0 left-0 h-full w-[18rem] bg-white transform ${openAside ? "translate-x-0" : "-translate-x-full"
+            } transition duration-300 z-50 p-6`}
+        >
+          <button onClick={() => setOpenAside(false)}>✕</button>
 
-          <button onClick={() => setIsOpen(false)}>✕</button>
+          <div className="mt-10 space-y-4 flex flex-col">
 
-          <div className="mt-10 space-y-3">
-            <Link to="/" onClick={() => setIsOpen(false)}>Home</Link>
-            <Link to="/browseJobs" onClick={() => setIsOpen(false)}>Browse Jobs</Link>
-            {user && <Link to='/profile' className="hover:text-teal-300 transition">Profile</Link>}
-            <Link to="/contact" onClick={() => setIsOpen(false)}>Contact</Link>
-            <Link to="/login" onClick={() => setIsOpen(false)} className="text-green-500">
-              Login
-            </Link>
+            {/* COMMON LINKS */}
+            <Link to="/" onClick={() => setOpenAside(false)}>Home</Link>
+
+            {/* JOBSEEKER */}
+            {(!user || user.role === "jobseeker") && (
+              <>
+                <Link to="/browseJobs" onClick={() => setOpenAside(false)}>Browse Jobs</Link>
+                {user && <Link to="/profile" onClick={() => setOpenAside(false)}>Profile</Link>}
+                <Link to="/contact" onClick={() => setOpenAside(false)}>Contact</Link>
+              </>
+            )}
+
+            {/* RECRUITER */}
+            {user?.role === "recruiter" && (
+              <>
+                <Link to="/recruiter/home" onClick={() => setOpenAside(false)}>Home</Link>
+                <Link to="/recruiter/dashboard" onClick={() => setOpenAside(false)}>Dashboard</Link>
+                <Link to="/recruiter/profile" onClick={() => setOpenAside(false)}>Profile</Link>
+              </>
+            )}
+
+            {/* AUTH BUTTONS */}
+            {!user ? (
+              <>
+                <Link
+                  to="/jobseeker-Login"
+                  onClick={() => setOpenAside(false)}
+                  className="text-green-600 font-medium"
+                >
+                  Login
+                </Link>
+
+                <Link
+                  to="/recruiter-Login"
+                  onClick={() => setOpenAside(false)}
+                  className="flex items-center gap-2 text-teal-600 font-medium"
+                >
+                  Recruiter
+                  <FaArrowRight />
+                </Link>
+              </>
+            ) : (
+              <button
+                onClick={() => {
+                  logout();
+                  setOpenAside(false);
+                }}
+                className="text-red-500 font-medium"
+              >
+                Logout
+              </button>
+            )}
           </div>
         </div>
 
         {/* NAVBAR */}
-        <div className="max-w-7xl text-white mx-auto px-6 h-10 flex items-center justify-between">
+        <div className="max-w-7xl text-white mx-auto px-4 sm:px-6 h-10 flex items-center justify-between">
 
+          {/* MOBILE NAV */}
+          <div className="flex lg:hidden items-center justify-between w-full">
 
-          {/* HAMBURGER */}
-          <button onClick={() => setIsOpen(true)} className="lg:hidden text-white text-2xl">
-            ☰
-          </button>
+            {/* HAMBURGER */}
+            <button
+              onClick={() => setOpenAside(true)}
+              className="text-2xl"
+            >
+              ☰
+            </button>
+
+            {/* LOGO */}
+            <img
+              src="/ui/hirehubLogo.png"
+              alt="Logo"
+              className="w-28 mt-3"
+            />
+          </div>
 
           {/* DESKTOP MENU */}
-          <div className="hidden md:flex items-center justify-between w-full">
+          <div className="hidden lg:flex items-center justify-between w-full">
 
-            {/* LEFT LOGO */}
-            <h1 className="text-white text-xl font-semibold">
-              Hire<span className="text-teal-200 font-bold italic">Hub</span>
-            </h1>
-
-            {/* CENTER MENU */}
-            <div className="flex gap-14 text-[15px] font-medium">
-              <NavLink to='/' className={({ isActive }) => isActive ? "text-teal-200 font-bold" : "text-white"}>Home</NavLink>
-              <NavLink to='/browseJobs' className={({ isActive }) => isActive ? "text-teal-200 font-bold" : "text-white"}>Browse Jobs</NavLink>
-              {user && <NavLink to='/profile' className={({ isActive }) => isActive ? "text-teal-200 font-bold" : "text-white"}>Profile</NavLink>}
-              <NavLink to='/contact' className={({ isActive }) => isActive ? "text-teal-200 font-bold" : "text-white"}>Contact</NavLink>
+            {/* LOGO */}
+            <div>
+              <img src='/ui/hirehubLogo.png' alt="Logo" className="w-32 mt-3" />
             </div>
 
-            {/* RIGHT BUTTON */}
-            <div>
-              {user ? (<button onClick={logout} className="bg-white/90 text-black hover:bg-teal-400/90 hover:text-white px-6 py-2.5 font-semibold rounded-xl transition">
-                Logout
-              </button>) : (
-                <Link to='/login' className="bg-white/90 text-black hover:bg-teal-400/90 hover:text-white px-6 py-2.5 font-semibold rounded-xl transition">
-                  Login
-                </Link>
+            {/* NAV LINKS */}
+            <div className="flex gap-16 mr-90 text-sm font-medium">
+
+              {(!user || user.role === "jobseeker") && (
+                <>
+                  <NavLink to="/" className={({ isActive }) => isActive ? "text-teal-200 font-bold" : ""}>
+                    Home
+                  </NavLink>
+
+                  <NavLink to="/browseJobs" className={({ isActive }) => isActive ? "text-teal-200 font-bold" : ""}>
+                    Browse Jobs
+                  </NavLink>
+
+                  {user && (
+                    <NavLink to="/jobseeker/profile" className={({ isActive }) => isActive ? "text-teal-200 font-bold" : ""}>
+                      Profile
+                    </NavLink>
+                  )}
+
+                  <NavLink to="/contact" className={({ isActive }) => isActive ? "text-teal-200 font-bold" : ""}>
+                    Contact
+                  </NavLink>
+                </>
+              )}
+
+              {user?.role === "recruiter" && (
+                <>
+                  <NavLink to="/recruiter/home" className={({ isActive }) => isActive ? "text-teal-200 font-bold" : ""}>
+                    Home
+                  </NavLink>
+
+                  <NavLink to="/recruiter/dashboard" className={({ isActive }) => isActive ? "text-teal-200 font-bold" : ""}>
+                    Dashboard
+                  </NavLink>
+
+                  <NavLink to="/recruiter/profile" className={({ isActive }) => isActive ? "text-teal-200 font-bold" : ""}>
+                    Profile
+                  </NavLink>
+                </>
               )}
             </div>
 
-          </div>
+            {/* AUTH BUTTONS */}
+            <div className="flex items-center gap-3">
 
-        </div>
-      </nav>
-    )
-    
-  } 
+              {!user ? (
+                <>
+                  {/* Primary Login */}
+                  <Link
+                    to="/jobseeker-Login"
+                    className="bg-white text-black hover:bg-teal-400 hover:text-white px-6 py-2.5 font-semibold rounded-xl transition"
+                  >
+                    Login
+                  </Link>
 
-  else if (!user || user.role === 'recruiter') {
-    return (
-      <nav className="w-full py-4 shadow-lg fixed bg-teal-700/90 top-0 left-0 z-40">
-
-        {/* MOBILE MENU */}
-        <div className={`fixed top-0 left-0 h-full w-[18rem] bg-white transform ${isOpen ? "translate-x-0" : "-translate-x-full"
-          } transition duration-300 z-50 p-6`}>
-
-          <button onClick={() => setIsOpen(false)}>✕</button>
-
-          <div className="mt-10 space-y-3">
-            <Link to="/recruiter/home" onClick={() => setIsOpen(false)}>Home</Link>
-            <Link to="/recruiter/dashboard" onClick={() => setIsOpen(false)}>Dashboard</Link>
-            <Link to='/recruiter/profile' className="hover:text-teal-300 transition">Profile</Link>
-            <Link to="/login" onClick={() => setIsOpen(false)} className="text-green-500">
-              Login
-            </Link>
-          </div>
-        </div>
-
-        {/* NAVBAR */}
-        <div className="max-w-7xl text-white mx-auto px-6 h-10 flex items-center justify-between">
-
-
-          {/* HAMBURGER */}
-          <button onClick={() => setIsOpen(true)} className="lg:hidden text-white text-2xl">
-            ☰
-          </button>
-
-          {/* DESKTOP MENU */}
-          <div className="hidden md:flex items-center justify-between w-full">
-
-            {/* LEFT LOGO */}
-            <h1 className="text-white text-xl font-semibold">
-              Hire<span className="text-teal-200 font-bold italic">Hub</span>
-            </h1>
-
-            {/* CENTER MENU */}
-            <div className="flex gap-14 text-[15px] font-medium">
-              <NavLink to='/recuriter/home' className={({ isActive }) => isActive ? "text-teal-200 font-bold" : "text-white"}>Home</NavLink>
-              <NavLink to='recruiter/dashboard' className={({ isActive }) => isActive ? "text-teal-200 font-bold" : "text-white"}>Dashboard</NavLink>
-              <NavLink to='/recruiter/profile' className={({ isActive }) => isActive ? "text-teal-200 font-bold" : "text-white"}>Profile</NavLink>
-            </div>
-
-            {/* RIGHT BUTTON */}
-            <div>
-              {user ? (<button onClick={logout} className="bg-white/90 text-black hover:bg-teal-400/90 hover:text-white px-6 py-2.5 font-semibold rounded-xl transition">
-                Logout
-              </button>) : (
-                <Link to='/login' className="bg-white/90 text-black hover:bg-teal-400/90 hover:text-white px-6 py-2.5 font-semibold rounded-xl transition">
-                  Login
-                </Link>
+                  {/* Secondary Recruiter */}
+                  <Link
+                    to="/recruiter-Login"
+                    className="flex items-center gap-2 border border-white px-5 py-2.5 rounded-xl hover:bg-white hover:text-teal-700 transition group"
+                  >
+                    Recruiter
+                    <FaArrowRight className="text-sm transition-transform group-hover:translate-x-1" />
+                  </Link>
+                </>
+              ) : (
+                <button onClick={() => setOpenModal(true)}
+                  className="bg-white text-black hover:bg-red-500 hover:text-white px-6 py-2.5 font-semibold rounded-xl transition"
+                >
+                  Logout
+                </button>
               )}
-            </div>
 
+            </div>
           </div>
 
         </div>
+
       </nav>
-    )
-  }
+      {openModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+
+          {/* Modal Box */}
+          <div className="bg-white rounded-2xl p-6 w-[90%] max-w-sm shadow-lg">
+
+            <h2 className="text-lg font-semibold text-slate-800 mb-2">
+              Confirm Logout
+            </h2>
+
+            <p className="text-sm text-slate-500 mb-6">
+              Are you sure you want to logout?
+            </p>
+
+            <div className="flex justify-end gap-3">
+
+              {/* Cancel */}
+              <button
+                onClick={() => setOpenModal(false)}
+                className="px-4 py-2 rounded-lg border text-slate-600 hover:bg-slate-100"
+              >
+                Cancel
+              </button>
+
+              {/* Confirm */}
+              <button
+                onClick={() => {
+                  logout();
+                  setOpenModal(false);
+                }}
+                className="px-4 py-2 rounded-lg bg-red-500 text-white hover:bg-red-600"
+              >
+                Logout
+              </button>
+
+            </div>
+          </div>
+        </div>
+      )}
+    </>
+  );
 }
 
-export default Navbar
+export default Navbar;

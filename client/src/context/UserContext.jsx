@@ -19,15 +19,16 @@ function UserProvider({ children }) {
       navigate('/')
     } catch (err) {
       console.log(err.data?.message)
-    }
+    } 
   }
 
   useEffect(() => {
     const userFetch = async () => {
       try {
         const res = await API.get('/authentication/userDetails')
-        setUser(res.data.user)
-        console.log(res.data)
+        const data=res.data.user
+        setUser(data)
+        console.log()
       } catch (err) {
         console.log(err.response?.data)
         setUser(null)

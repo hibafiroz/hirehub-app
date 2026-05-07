@@ -2,18 +2,20 @@ import React, { useContext, useEffect, useState } from 'react'
 import { UserContext } from '../../context/UserContext'
 import API from '../../api/axios'
 import { Link } from 'react-router-dom';
+import Loader from '../../components/Loader';
 
 function Profile() {
 
   const { user, setUser } = useContext(UserContext)
 
   const [open, setOpen] = useState(false);
+  const [loading, setLoading] = useState(true)
 
   const [formData, setFormData] = useState({
     name: user?.name,
     phone: user?.phone || '',
     location: user?.location || '',
-    experience: user.experience || '',
+    experience: user?.experience || '',
     skills: user?.skills || ''
   })
 
@@ -24,28 +26,22 @@ function Profile() {
   })
 
   useEffect(() => {
-    if (user) {
-      setFormData({
-        name: user.name || '',
-        phone: user.phone || '',
-        location: user.location || '',
-        experience: user.experience || '',
-        skills: user.skills || []
-      })
-    }
-  }, [user])
-
-  useEffect(() => {
     const fetchProfile = async () => {
-      const res = await API.get('/jobseeker/profile')
-      setUser(res.data.user)
+      try {
+        const res = await API.get('/jobseeker/profile')
+        setUser(res.data.user)
+      } catch (err) {
+        console.log(err.message)
+      } finally {
+        setLoading(false)
+      }
     }
     fetchProfile()
   }, [])
 
 
   const handleChange = (e) => {
-    const {name, value}=e.target
+    const { name, value } = e.target
     if (name === "skills") {
       setFormData({
         ...formData,
@@ -61,14 +57,14 @@ function Profile() {
 
   const handleSubmit = async (e) => {
     e.preventDefault()
-    let errors={}
+    let errors = {}
 
-    if (formData.phone&&formData.phone.length !== 10) {
-      errors.phoneErr='Invalid phone number'
+    if (formData.phone && formData.phone.length !== 10) {
+      errors.phoneErr = 'Invalid phone number'
     }
 
-    if (formData.location&&formData.location.length <5 ) {
-      errors.locationErr='Location must be atleast 5 characters'
+    if (formData.location && formData.location.length < 5) {
+      errors.locationErr = 'Location must be atleast 5 characters'
     }
 
     if (Object.keys(errors).length > 0) {
@@ -85,113 +81,124 @@ function Profile() {
         skills: formData.skills
       })
       const updated = await API.get('/jobseeker/profile')
-    setUser(updated.data.user)
+      setUser(res.data.user)
+      console.log(res.data.user)
 
-    setOpen(false)
+      setOpen(false)
 
-  } catch (err) {
-    console.log(err.response?.data?.message || err.message);
-  }
+    } catch (err) {
+      console.log(err.response?.data?.message || err.message);
+    }
   }
 
   return (
     <div>
-      <div className="absolute inset-0 bg-cover bg-center -z-10"
-        style={{ backgroundImage: "url('/assets/images/background3.png')" }}></div>
-      <div className="absolute inset-0 bg-white/60 -z-10"></div>
+      <div className="fixed inset-0 bg-cover bg-center -z-10" style={{ backgroundImage: "url('/ui/background3.png')" }}></div>
+      <div className="fixed inset-0 bg-white/60 -z-10"></div>
 
-      <main className="max-w-3xl lg:max-w-5xl mx-auto px-4 sm:px-6 mt-20">
+      <main className="max-w-3xl lg:max-w-5xl mx-auto px-4 sm:px-6 pt-24 min-h-screen flex flex-col justify-center lg:block">
+        
+              {/*HEADER*/}
+              <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-6 mb-8">
+                <div>
+                  <h2 className="text-3xl font-semibold text-slate-700">
+                    My <span className="text-teal-800">Profile</span>
+                  </h2>
+                  <p className="text-slate-600 mt-1">Manage your personal information</p>
+                </div>
 
-        {/*HEADER*/}
-        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-6 mb-8">
-          <div>
-            <h2 className="text-3xl font-semibold text-slate-700">
-              My <span className="text-teal-800">Profile</span>
-            </h2>
-            <p className="text-slate-600 mt-1">Manage your personal information</p>
-          </div>
+                {/*ACTIONS*/}
+                <div className="flex flex-col sm:flex-row gap-4 sm:justify-end mt-2 sm:mt-12">
+                  <button onClick={() => setOpen(true)}
+                    className="px-6 py-2 rounded-xl bg-teal-700/80 text-white hover:bg-teal-700/70">
+                    Edit Profile
+                  </button>
 
-          {/*ACTIONS*/}
-          <div className="flex flex-col sm:flex-row gap-4 sm:justify-end mt-2 sm:mt-12">
-            <button onClick={() => setOpen(true)}
-              className="px-6 py-2 rounded-xl bg-teal-700/80 text-white hover:bg-teal-700/70">
-              Edit Profile
-            </button>
+                  <Link to="/jobseeker/application"
+                    className="px-6 py-2 rounded-xl bg-white text-center border border-black/20 text-slate-800 hover:bg-teal-700/70 hover:text-white">
+                    My Applications
+                  </Link>
+                </div>
 
-            <Link to="/application"
-              className="px-6 py-2 rounded-xl bg-white text-center border border-black/20 text-slate-800 hover:bg-teal-700/70 hover:text-white">
-              My Applications
-            </Link>
-          </div>
-
-        </div>
+              </div>
 
         {/*PROFILE CARDS*/}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
+        
+        {
+          loading ? (
+            <div className="flex justify-center items-center min-h-[10vh]">
+              <Loader />
+            </div>
+          ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
 
-          {/*BASIC INFO */}
-          <div className="bg-white/50 shadow-[0_7px_40px_rgba(15,118,110,0.45)]
+                {/*BASIC INFO */}
+                <div className="bg-white/50 shadow-[0_7px_40px_rgba(15,118,110,0.45)]
                   border border-black/20 rounded-2xl p-8 space-y-4">
 
-            <h3 className="text-xl font-semibold text-slate-700">Basic Details</h3>
+                  <h3 className="text-xl font-semibold text-slate-700">Basic Details</h3>
 
-            <div>
-              <label className="text-slate-500 text-sm">Name</label>
-              <p className="text-slate-700 font-medium">
-                {user?.name}
-              </p>
-            </div>
+                  <div>
+                    <label className="text-slate-500 text-sm">Name</label>
+                    <p className="text-slate-700 font-medium">
+                      {user?.name}
+                    </p>
+                  </div>
 
-            <div>
-              <label className="text-slate-500 text-sm">Email</label>
-              <p className="text-slate-700 font-medium cursor-not-allowed" readOnly>
-                {user?.email}
-              </p>
-            </div>
+                  <div>
+                    <label className="text-slate-500 text-sm">Email</label>
+                    <p className="text-slate-700 font-medium cursor-not-allowed" readOnly>
+                      {user?.email}
+                    </p>
+                  </div>
 
-            <div>
-              <label className="text-slate-500 text-sm">Phone</label>
-              <p className="text-slate-700 font-medium">
-                {user?.phone || "Not Added"}
-              </p>
-            </div>
+                  <div>
+                    <label className="text-slate-500 text-sm">Phone</label>
+                    <p className="text-slate-700 font-medium">
+                      {user?.phone || "Not Added"}
+                    </p>
+                  </div>
 
-            <div>
-              <label className="text-slate-500 text-sm">Location</label>
-              <p className="text-slate-700 font-medium">
-                {user?.location || "Not Added"}
-              </p>
-            </div>
-          </div>
+                  <div>
+                    <label className="text-slate-500 text-sm">Location</label>
+                    <p className="text-slate-700 font-medium">
+                      {user?.location || "Not Added"}
+                    </p>
+                  </div>
+                </div>
 
-          {/*PROFESSIONAL INFO*/}
-          <div className="bg-white/50 shadow-[0_7px_40px_rgba(15,118,110,0.45)]
+                {/*PROFESSIONAL INFO*/}
+                <div className="bg-white/50 shadow-[0_7px_40px_rgba(15,118,110,0.45)]
                   border border-black/20 rounded-2xl p-8 space-y-4">
 
-            <h3 className="text-xl font-semibold text-slate-700">Professional Details</h3>
+                  <h3 className="text-xl font-semibold text-slate-700">Professional Details</h3>
 
-            <div>
-              <label className="text-slate-500 text-sm">Skills</label>
-              <p className="text-slate-700 font-medium">
-                {user?.skills?.length ? (user.skills.join(', ')) : ("Not added")}
-              </p>
-            </div>
+                  <div>
+                    <label className="text-slate-500 text-sm">Skills</label>
+                    <p className="text-slate-700 font-medium">
+                      {user?.skills?.length ? (user.skills.join(', ')) : ("Not added")}
+                    </p>
+                  </div>
 
-            <div>
-              <label className="text-slate-500 text-sm">Experience</label>
-              <p className="text-slate-700 font-medium">
-                {user?.experience || "Not added"}
-              </p>
-            </div>
+                  <div>
+                    <label className="text-slate-500 text-sm">Experience</label>
+                    <p className="text-slate-700 font-medium">
+                      {user?.experience || "Not added"}
+                    </p>
+                  </div>
 
-            <div>
-              <label className="text-slate-500 text-sm">Role</label>
-              <p className="text-slate-700 font-medium">
-                {user?.role}
-              </p>
-            </div>
-          </div>
-        </div>
+                  <div>
+                    <label className="text-slate-500 text-sm">Role</label>
+                    <p className="text-slate-700 font-medium">
+                      {user?.role}
+                    </p>
+                  </div>
+                </div>
+              </div>
+          )
+        }
+
+
       </main>
 
       {/*MODAL*/}
@@ -236,11 +243,11 @@ function Profile() {
               </div>
 
               <div>
-                  <label className="text-sm text-gray-600">Location</label>
-                  <input name="location" value={formData.location} onChange={handleChange} placeholder="Enter Location"
-                    className="w-full rounded-xl px-4 py-3 border border-gray-400" />
-                  <p className='mt-1 text-red-500 text-sm'>{formErr.locationErr}</p>
-                </div>
+                <label className="text-sm text-gray-600">Location</label>
+                <input name="location" value={formData.location} onChange={handleChange} placeholder="Enter Location"
+                  className="w-full rounded-xl px-4 py-3 border border-gray-400" />
+                <p className='mt-1 text-red-500 text-sm'>{formErr.locationErr}</p>
+              </div>
 
               <div className='mt-5'>
                 <label className="text-sm text-gray-600">Skills (comma separated)</label>
@@ -250,7 +257,7 @@ function Profile() {
               </div>
 
               <div className="flex justify-end gap-4 pt-4">
-                <button type="button" onClick={()=>setOpen(false)}
+                <button type="button" onClick={() => setOpen(false)}
                   className="px-5 py-2 rounded-xl bg-gray-200 border border-black/20 hover:bg-gray-300">
                   Cancel
                 </button>
