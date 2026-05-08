@@ -25,8 +25,8 @@ const registerPost = async (req, res, next) => {
 
     res.cookie("jobportaltoken", token, {
       httpOnly: true,
-      secure: false,
-      sameSite: "lax"
+      secure: true,
+      sameSite: "none"
     });
 
     res.json({
@@ -77,8 +77,8 @@ const login = async (req, res, next) => {
 
     res.cookie("jobportaltoken", token, {
       httpOnly: true,
-      secure: false,
-      sameSite: "lax",
+      secure: true,
+      sameSite: "none",
       maxAge: 24 * 60 * 60 * 1000
     });
 
@@ -101,8 +101,8 @@ const login = async (req, res, next) => {
 const logout = (req, res) => {
   res.clearCookie("jobportaltoken", {
     httpOnly: true,
-    sameSite: "lax",
-    secure: false
+    sameSite: "none",
+    secure: true
   });
   res.json({ message: "Logged out successfully" })
 }

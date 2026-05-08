@@ -10,26 +10,17 @@ const { errorHandlingMiddleware } = require('./Middleware/errorMiddleware')
 const PORT = process.env.PORT
 const path = require('path');
 
-//Middleware
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
-app.use(cookieParser())
-app.use(express.urlencoded({ extended: true }))
-app.use(express.json())
+//Cors
 app.use(cors({
   origin: 'https://hirehub-app-psi.vercel.app',
   credentials: true
 }))
 
-// cache
-app.use((req, res, next) => {
-  res.setHeader(
-    'Cache-Control',
-    'no-store, no-cache, must-revalidate, private'
-  )
-  res.setHeader('Pragma', 'no-cache')
-  res.setHeader('Expires', '0')
-  next()
-})
+//Middleware
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+app.use(cookieParser())
+app.use(express.urlencoded({ extended: true }))
+app.use(express.json())
 
 //Routes
 app.use('/', require('./routes/publicRoutes'))
@@ -39,6 +30,7 @@ app.use('/recruiter', require('./routes/recruiterRoutes'))
 app.use('/admin', require('./routes/adminRoutes'))
 app.use('/send', require('./routes/testRoute'))
 
+//Central Error handling middleware
 app.use(errorHandlingMiddleware)
 
-app.listen(`${PORT}`, () => console.log(`app is listening on port: ${PORT}`))
+module.exports = app
