@@ -1,5 +1,5 @@
 const express = require('express')
-const { home, browseJobs, jobDetail, contact } = require('../controller/PublicController')
+const { home, browseJobs, jobDetail, contact } = require('../controller/publicController')
 const { tokenVerify, optionalTokenVerify } = require('../utils/auth')
 const router = express()
 
