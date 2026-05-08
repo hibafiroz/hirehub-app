@@ -1,7 +1,10 @@
 const multer = require('multer')
 const path = require('path')
+const { CloudinaryStorage } = require('multer-storage-cloudinary')
+const cloudinary = require('../config/cloudinary')
 
-// RESUME UPLOAD 
+
+// RESUME FILTER
 const resumeFilter = (req, file, cb) => {
   const allowedExt = /pdf|doc|docx/
   const ext = allowedExt.test(path.extname(file.originalname).toLowerCase())
@@ -19,22 +22,8 @@ const resumeFilter = (req, file, cb) => {
   else cb(new Error('Only PDF or DOC resumes are allowed'))
 }
 
-const resumeUpload = multer({
-  storage: multer.diskStorage({
-    destination: (req, file, cb) => {
-      cb(null, './uploads/applications')
-    },
-    filename: (req, file, cb) => {
-      cb(null, Date.now() + path.extname(file.originalname))
-    }
-  }),
-  fileFilter: resumeFilter
-})
 
-
-
-//  LOGO UPLOAD 
-
+// LOGO FILTER
 const logoFilter = (req, file, cb) => {
   const allowed = /jpeg|jpg|png|webp/
   const ext = allowed.test(path.extname(file.originalname).toLowerCase())
@@ -44,15 +33,37 @@ const logoFilter = (req, file, cb) => {
   else cb(new Error('Only image files allowed for logo'))
 }
 
+
+
+// RESUME STORAGE
+const resumeStorage = new CloudinaryStorage({
+  cloudinary,
+  params: {
+    folder: 'hirehub/resumes',
+    resource_type: 'raw'
+  }
+})
+
+
+// LOGO STORAGE
+const logoStorage = new CloudinaryStorage({
+  cloudinary,
+  params: {
+    folder: 'hirehub/logos',
+    allowed_formats: ['jpg', 'png', 'jpeg', 'webp']
+  }
+})
+
+
+
+// MULTER
+const resumeUpload = multer({
+  storage: resumeStorage,
+  fileFilter: resumeFilter
+})
+
 const logoUpload = multer({
-  storage: multer.diskStorage({
-    destination: (req, file, cb) => {
-      cb(null, './uploads/logo')
-    },
-    filename: (req, file, cb) => {
-      cb(null, Date.now() + path.extname(file.originalname))
-    }
-  }),
+  storage: logoStorage,
   fileFilter: logoFilter
 })
 

@@ -152,7 +152,7 @@ function Application() {
                 <div className="mb-4">
                   <p className="text-sm font-medium mb-1">Resume</p>
                   <a
-                    href={`http://localhost:5000/uploads/applications/${selectedApp.resume}`}
+                    href={selectedApp.resume}
                     target="_blank"
                     className="text-teal-600 underline text-sm"
                   >

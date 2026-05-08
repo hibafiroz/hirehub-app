@@ -227,7 +227,7 @@ const companyPost = async (req, res, next) => {
     try {
         const { name, location, industry, size, website, email, description } = req.body
         const newCompany = await Company.create({
-          name, location, industry, size, website, email, logo: req.file.filename, description, recruiter: req.user.id
+          name, location, industry, size, website, email, logo: req.file.path, description, recruiter: req.user.id
         })
         await User.findByIdAndUpdate(req.user.id, {
             company: newCompany._id

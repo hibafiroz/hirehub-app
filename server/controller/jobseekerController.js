@@ -71,7 +71,7 @@ const applyNowPost = async (req, res, next) => {
       job: req.params.id,
       applicant: req.user.id,
       phone,
-      resume: req.file ? req.file.filename : null,
+      resume: req.file ? req.file.path : null,
       status: "applied",
       coverLetter,
     });
