@@ -239,7 +239,7 @@ function Home() {
                 </div>
               ) : (
                 logos.map((item) => (
-                  <img className="h-8 sm:h-10 lg:h-12 object-contain" key={item._id} src={`http://localhost:5000/uploads/logo/${item.logo}`} alt="logo" className="h-12" />
+                  <img className="h-8 sm:h-10 lg:h-12 object-contain" key={item._id} src={`${import.meta.env.VITE_API_URL}/uploads/logo/${item.logo}`} alt="logo" className="h-12" />
                 )
                 )
               )
