@@ -14,8 +14,6 @@ const path = require('path');
 app.use(cors({
  origin: [
     'https://hirehub-app-psi.vercel.app',
-    'https://hirehub-r8weunzg3-hibafirozs-projects.vercel.app',
-    'https://hirehub-8i5k06nmx-hibafirozs-projects.vercel.app',
     'http://localhost:5173'
   ],
   credentials: true

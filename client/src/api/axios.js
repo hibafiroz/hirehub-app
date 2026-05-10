@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const API = axios.create({
-  baseURL: 'http://localhost:5000',
+  baseURL: 'https://hirehub-app-h2g8.vercel.app',
   withCredentials: true
 });
 
