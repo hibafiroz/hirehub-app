@@ -20,8 +20,8 @@ const home = async (req, res, next) => {
           title: '$_id'
         }
       }
-    ]).limit(6)
-
+    ])
+    
     const companyLogo = await Company.find({}, { logo: 1 }).limit(4)
 
     res.json({ jobs, companyLogo })
@@ -80,7 +80,7 @@ const browseJobs = async (req, res, next) => {
       Job.countDocuments(query),
     ]);
 
-    // ✅ applied jobs
+    // applied jobs
     let appliedJobs = {};
 
     if (req.user) {

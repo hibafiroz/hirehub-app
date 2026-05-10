@@ -16,11 +16,19 @@ function Register() {
         nameErr: '', emailErr: '', roleErr: '', passwordErr: '', confirmPasswordErr: '', fullErr: ''
     })
 
+    const [registering, setRegistering] = useState(false)
+
     const handleChange = (e) => {
+        const { name, value } = e.target
         setFormData({
             ...formData,
-            [e.target.name]: e.target.value
+            [name]: value
         })
+        setFormErr((prev) => ({
+            ...prev,
+            [`${name}Err`]: '',
+            fullErr: ''
+        }))
     }
 
     const handleSubmit = async (e) => {
@@ -29,6 +37,7 @@ function Register() {
 
         if (!formData.password && !formData.confirmPassword && !formData.name && !formData.email && !formData.role) {
             newErr.fullErr = 'Please fill the form'
+            setFormErr(newErr)
             return
         }
 
@@ -43,6 +52,8 @@ function Register() {
             return
         }
 
+        setRegistering(true)
+
         try {
             const res = await API.post('/authentication/register', formData)
             const user = res.data.user
@@ -54,6 +65,8 @@ function Register() {
             }
         } catch (err) {
             console.log(err.response?.data?.message)
+        } finally {
+            setRegistering(false)
         }
     }
 
@@ -148,10 +161,16 @@ function Register() {
                                     <input onChange={handleChange} value={formData.confirmPassword} name="confirmPassword" type="password" placeholder="••••••••" className="w-full rounded-lg border border-black/30 bg-white/80 px-3.5 py-2 text-[13px] outline-none shadow-sm focus:ring-2 focus:ring-teal-500 focus:border-transparent" />
                                     <p className="mt-1 font-semibold text-xs text-red-600">{formErr.confirmPasswordErr}</p>
                                 </div>
+                                <p name='fullErr' className="text-red-600 font-semibold text-xs">{formErr.fullErr}</p>
                             </div>
 
-                            <button type="submit" className="w-full mt-2 rounded-lg bg-gradient-to-r from-teal-700 via-teal-600 to-emerald-500 px-4 py-2 text-sm font-semibold text-white shadow-[0_14px_30px_rgba(15,118,110,0.45)] hover:scale-[1.03] transition">Create Account</button>
-                            <p name='fullErr' className="text-red-600 font-semibold text-xs mt-1">{formErr.allErr}</p>
+                            <button type="submit"
+                                disabled={registering}
+                                className={`w-full py-3 rounded-xl text-white transition font-medium 
+                               ${registering ? "bg-teal-400 cursor-not-allowed" : "bg-teal-700/90 hover:bg-teal-400"}`}
+                            >
+                                {registering ? "Redirecting..." : "Create Account"}
+                            </button>
                             <p className="text-[10.5px] text-slate-600 text-center mt-2">By creating an account, you'll be able to save jobs, track your applications, and get better matches.</p>
                         </form>
                     </div>

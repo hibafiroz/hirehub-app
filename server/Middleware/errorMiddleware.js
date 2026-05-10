@@ -1,7 +1,7 @@
 const { AppError } = require("../utils/error")
 
 const errorHandlingMiddleware = (error, req, res, next) => {
-    console.log('ERROR MIDDLEWARE - ', error.stack)
+    console.log('ERROR MIDDLEWARE - ', error)
     if (error instanceof AppError) {
         return res.status(error.status).json({
             success: false,

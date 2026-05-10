@@ -16,6 +16,8 @@ function Company() {
     nameErr: '', locationErr: '', industryErr: '', sizeErr: '', websiteErr: '', emailErr: '', descriptionErr: '', logoErr: '', fullErr: ''
   })
 
+  const [saving, setSaving] = useState(false)
+
   const handleChange = (e) => {
     const { name, value, files } = e.target
     if (name === "logo") {
@@ -78,6 +80,8 @@ function Company() {
       return
     }
 
+    setSaving(true)
+
     try {
       const data = new FormData();
 
@@ -94,10 +98,13 @@ function Company() {
       const res = await API.post('/recruiter/company', data);
 
       console.log(res.data.message);
+      toast.success('Company Added Successfully!')
       navigate('/recruiter/home');
 
     } catch (err) {
       toast.error(err.response?.data?.message || "Something went wrong ❌");
+    } finally {
+      setSaving(false)
     }
   }
 
@@ -126,7 +133,7 @@ function Company() {
             onSubmit={handleForm}
             className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 shadow-[0_18px_40px_rgba(15,118,110,0.45)]
               bg-white/10 border border-black/20 rounded-2xl p-4 sm:p-6 lg:p-8 backdrop-blur-sm"
-            >
+          >
             {/*enctype="multipart/form-data axios automatically handles this*/}
 
             {/* COMPANY NAME */}
@@ -212,10 +219,13 @@ function Company() {
             </div>
 
             <div className="sm:col-span-2 flex justify-stretch sm:justify-end">
-              <button type="submit" className="w-full sm:w-auto px-8 py-3 rounded-xl
-                       bg-teal-600 hover:bg-teal-500
-                       text-white transition">
-                Save Company
+              <button
+                type="submit"
+                disabled={saving}
+                className={`w-full py-3 rounded-xl text-white transition font-medium 
+              ${saving ? "bg-teal-400 cursor-not-allowed" : "bg-teal-700/90 hover:bg-teal-400"}`}
+              >
+                {saving ? "Saving..." : "Save Company"}
               </button>
             </div>
 

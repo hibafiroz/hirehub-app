@@ -4,6 +4,7 @@ import { Link, useNavigate, useParams } from 'react-router-dom'
 import toast from 'react-hot-toast'
 import { ArrowLeftToLine, CornerUpLeft, Undo } from "lucide-react";
 import AnimatedSection from '../../components/AnimatedSection';
+import Loader from '../../components/Loader';
 
 function EditJob() {
 
@@ -13,33 +14,43 @@ function EditJob() {
   const [formData, setFormData] = useState({
     title: "", jobLocation: "", jobMode: "", type: "", experience: "", salaryRange: "", skills: "", describeRole: "", responsibilities: "", requirements: "", goodToHave: ""
   })
+  const [loading, setLoading] = useState(false)
+  const [saving, setSaving] = useState(false)
 
   useEffect(() => {
     const fetchJob = async () => {
-      const res = await API.get(`/recruiter/jobDetail/${id}`);
-      const data = res.data.job;
+      setLoading(true)
+      try {
+        const res = await API.get(`/recruiter/jobDetail/${id}`);
+        const data = res.data.job;
+        console.log(res.data.job)
 
-      setFormData({
-        title: data.title || "",
-        jobLocation: data.jobLocation || "",
-        jobMode: data.jobMode || "",
-        type: data.type || "",
-        experience: data.experience || "",
-        salaryRange: data.salaryRange || "",
+        setFormData({
+          title: data.title || "",
+          jobLocation: data.jobLocation || "",
+          jobMode: data.jobMode || "",
+          type: data.type || "",
+          experience: data.experience || "",
+          salaryRange: data.salaryRange || "",
 
-        // Convert arrays → string
-        skills: data.skills ? data.skills.join(", ") : "",
-        describeRole: data.describeRole || "",
-        responsibilities: data.responsibilities
-          ? data.responsibilities.join("\n")
-          : "",
-        requirements: data.requirements
-          ? data.requirements.join("\n")
-          : "",
-        goodToHave: data.goodToHave
-          ? data.goodToHave.join("\n")
-          : "",
-      });
+          // Convert arrays → string
+          skills: data.skills ? data.skills.join(", ") : "",
+          describeRole: data.describeRole || "",
+          responsibilities: data.responsibilities
+            ? data.responsibilities.join("\n")
+            : "",
+          requirements: data.requirements
+            ? data.requirements.join("\n")
+            : "",
+          goodToHave: data.goodToHave
+            ? data.goodToHave.join("\n")
+            : "",
+        });
+      } catch (err) {
+        console.log(err.message)
+      } finally {
+        setLoading(false)
+      }
     };
     fetchJob();
   }, [id]);
@@ -55,15 +66,20 @@ function EditJob() {
   const handleForm = async (e) => {
     e.preventDefault()
 
+    setSaving(true)
+
     try {
       const jobPost = await API.post(`/recruiter/editJob/${id}`, formData)
       console.log(jobPost.data.message)
       navigate(`/recruiter/jobDetail/${id}`)
     } catch (err) {
-      toast.error(err.response?.data?.message || "Something went wrong");
+      toast.error("Something went wrong")
+    } finally {
+      setSaving(false)
     }
-
   }
+
+  if(loading) return <Loader/>
 
   return (
     <div>
@@ -189,9 +205,13 @@ function EditJob() {
                 Cancel
               </Link>
 
-              <button type="submit"
-                className="w-full sm:w-auto px-6 sm:px-8 py-2.5 rounded-xl bg-teal-600/80 text-white font-medium hover:bg-teal-600/50 transition">Update
-                Job
+              <button
+                type="submit"
+                disabled={saving}
+                className={`py-3 px-6 rounded-xl text-white transition font-medium 
+              ${saving ? "bg-teal-400 cursor-not-allowed" : "bg-teal-700/90 hover:bg-teal-400"}`}
+              >
+                {saving ? "Updating..." : "Update Job"}
               </button>
             </div>
 
@@ -199,7 +219,7 @@ function EditJob() {
         </AnimatedSection>
 
       </main >
-    </div >
+      </div >
   )
 }
 

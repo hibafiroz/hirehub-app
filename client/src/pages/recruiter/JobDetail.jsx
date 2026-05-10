@@ -13,6 +13,7 @@ function JobDetail() {
   const navigate = useNavigate()
 
   const [job, setJob] = useState(null)
+  const [openModal, setOpenModal] = useState(null)
 
   useEffect(() => {
     const fetchJob = async () => {
@@ -28,10 +29,12 @@ function JobDetail() {
     e.preventDefault()
     try {
       const jobDlt = await API.delete(`/recruiter/deleteJob/${id}`)
+      toast.success('Job deleted successfully')
       navigate('/recruiter/jobList')
-      console.log(jobDlt.data.message)
     } catch (err) {
-      toast.error(err.response?.data?.message || "Something went wrong ❌");
+      toast.error(err.response?.data?.message || "Something went wrong");
+    } finally {
+      setOpenModal(false)
     }
   }
 
@@ -66,7 +69,7 @@ function JobDetail() {
                 </div>
                 <div>
 
-                  <button onClick={handleDlt}
+                  <button onClick={() => setOpenModal(true)}
                     className="w-full sm:w-auto inline-flex items-center justify-center px-6 py-2.5 rounded-lg bg-red-600/50 text-white hover:bg-red-500/30">
                     Delete
                   </button>
@@ -170,8 +173,46 @@ function JobDetail() {
           </main>
         </AnimatedSection>
 
+        {openModal && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+
+            {/* Modal Box */}
+            <div className="bg-white rounded-2xl p-6 w-[90%] max-w-sm shadow-lg">
+
+              <h2 className="text-lg font-semibold text-slate-800 mb-2">
+                Confirm Delete
+              </h2>
+
+              <p className="text-sm text-slate-500 mb-6">
+                Are you sure you want to delete this Job?
+              </p>
+
+              <div className="flex justify-end gap-3">
+
+                {/* Cancel */}
+                <button
+                  onClick={() => setOpenModal(false)}
+                  className="px-4 py-2 rounded-lg border text-slate-600 hover:bg-slate-100"
+                >
+                  Cancel
+                </button>
+
+                {/* Confirm */}
+                <button
+                  onClick={handleDlt}
+                  className="px-4 py-2 rounded-lg bg-red-500 text-white hover:bg-red-600"
+                >
+                  Delete
+                </button>
+
+              </div>
+            </div>
+          </div>
+        )}
+
       </div> :
       <Loader />
+
   )
 
 }

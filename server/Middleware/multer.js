@@ -35,23 +35,22 @@ const logoFilter = (req, file, cb) => {
 
 
 
-// RESUME STORAGE
+// CLOUDINARY STORAGE
 const resumeStorage = new CloudinaryStorage({
   cloudinary,
-  params: {
+  params: async (req, file) => ({
     folder: 'hirehub/resumes',
-    resource_type: 'raw'
-  }
+    resource_type: 'raw',
+    public_id: Date.now() + '-RESUME.pdf'
+  })
 })
 
-
-// LOGO STORAGE
 const logoStorage = new CloudinaryStorage({
   cloudinary,
-  params: {
+  params: async (req, file) => ({
     folder: 'hirehub/logos',
-    allowed_formats: ['jpg', 'png', 'jpeg', 'webp']
-  }
+    resource_type: 'image'
+  })
 })
 
 
@@ -66,6 +65,5 @@ const logoUpload = multer({
   storage: logoStorage,
   fileFilter: logoFilter
 })
-
 
 module.exports = { resumeUpload, logoUpload }

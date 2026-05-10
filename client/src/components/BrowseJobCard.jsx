@@ -4,6 +4,7 @@ import { UserContext } from '../context/UserContext';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import Loader from './Loader';
 import { useSearchParams } from "react-router-dom";
+import toast from 'react-hot-toast';
 
 function BrowseJobCard({ filters, search, locationSearch }) {
 
@@ -53,7 +54,7 @@ function BrowseJobCard({ filters, search, locationSearch }) {
                 const res = await API.get(`/browseJobs?${query}`);
 
                 setJobs(res.data.jobs);
-                console.log(res.data.jobs)
+                console.log(res.data)
                 setTotalPages(res.data.totalPages);
                 setAppliedJobs(res.data.appliedJobs);
 
@@ -147,7 +148,8 @@ function BrowseJobCard({ filters, search, locationSearch }) {
                                         ) : (
                                             <button
                                                 onClick={(e) => {
-                                                    e.stopPropagation();
+                                                        e.stopPropagation();
+                                                        toast.error('Please Login First')
                                                     navigate('/jobseeker-Login');
                                                 }}
                                                     className="bg-teal-600 text-white px-4 py-2 rounded text-sm w-full sm:w-auto"

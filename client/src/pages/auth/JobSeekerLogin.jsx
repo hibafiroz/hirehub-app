@@ -17,9 +17,10 @@ function JobseekerLogin() {
   const [loggingIn, setLoggingIn] = useState(false)
 
   const handleChange = (e) => {
+    const {name, value}=e.target
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value
+      [name]: value
     });
 
     setFormErr((prev) => ({
@@ -48,7 +49,7 @@ function JobseekerLogin() {
     }
 
     if (!formData.password) {
-      newErr.passwordErr = 'Please enter your email'
+      newErr.passwordErr = 'Please enter your password'
     }
 
     if (Object.keys(newErr).length > 0) {

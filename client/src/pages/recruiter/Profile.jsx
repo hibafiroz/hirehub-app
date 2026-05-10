@@ -71,7 +71,7 @@ function Profile() {
 
                                     {/* COMPANY HEADER */}
                                     <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-                                        <img src={`${import.meta.env.VITE_API_URL}/uploads/logo/${company.logo}`} className="w-20 h-20 sm:w-28 sm:h-28 object-contain rounded-xl shadow" alt="Company Logo" />
+                                        <img src={company.logo} className="w-20 h-20 sm:w-28 sm:h-28 object-contain rounded-xl shadow" alt="Company Logo" />
 
                                         <div>
                                             <h2 className="text-xl font-semibold text-slate-900">

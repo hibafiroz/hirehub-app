@@ -13,7 +13,6 @@ const profile = async (req, res) => {
 const editProfile = async (req, res, next) => {
   try {
     const { name, phone, location, skills, experience } = req.body
-    console.log("REQ BODY:", req.body);
     let data = {}
     if (name) data.name = name
     if (phone) data.phone = phone

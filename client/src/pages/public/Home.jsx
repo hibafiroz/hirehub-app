@@ -104,7 +104,8 @@ function Home() {
             Discover jobs across <span className="text-teal-100">popular roles</span>
           </h2>
 
-          <div className="flex flex-wrap justify-center gap-6 mt-10">            <HomeJobCard />
+          <div className="flex flex-wrap justify-center gap-6 mt-10">
+            <HomeJobCard />
           </div>
         </AnimatedSection>
 
@@ -239,9 +240,18 @@ function Home() {
                 </div>
               ) : (
                 logos.map((item) => (
-                  <img className="h-8 sm:h-10 lg:h-12 object-contain" key={item._id} src={item.logo} alt="logo" />
-                )
-                )
+                  <img
+                    className="h-8 sm:h-10 lg:h-12 object-contain"
+                    key={item._id}
+                    src={
+                      item.logo?.startsWith("http")
+                        ? item.logo
+                        : `${import.meta.env.VITE_API_URL}/uploads/logo/${item.logo}`
+                    }
+                    alt="logo"
+                  />
+                ))
+
               )
             }
 

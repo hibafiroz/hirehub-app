@@ -6,7 +6,7 @@ const User = require("../models/user")
 const { sendEmail } = require("../utils/email")
 
 
-const home = async(req, res) => {
+const home = async (req, res) => {
   const id = req.user.id
   const jobs = await Job.find({ recruiter: id })
   const jobIDs = jobs.map(job => job._id)
@@ -18,78 +18,78 @@ const home = async(req, res) => {
 
 
 const dashboard = async (req, res) => {
-    const recruiterId = req.user.id
-   const jobs = await Job.find({ recruiter: recruiterId })
-   const jobIds = jobs.map(job => job._id)
-    // Applications for those jobs
-    const applications = await Application.find({ job: { $in: jobIds } }).populate('job').populate('applicant')
+  const recruiterId = req.user.id
+  const jobs = await Job.find({ recruiter: recruiterId })
+  const jobIds = jobs.map(job => job._id)
+  // Applications for those jobs
+  const applications = await Application.find({ job: { $in: jobIds } }).populate('job').populate('applicant')
 
-     // JOBS PER DAY (LAST 7 DAYS)
-        const jobsPerWeek = await Job.aggregate([
-  {
-    $match: {
-      recruiter: new mongoose.Types.ObjectId(recruiterId)
+  // JOBS PER DAY (LAST 7 DAYS)
+  const jobsPerWeek = await Job.aggregate([
+    {
+      $match: {
+        recruiter: new mongoose.Types.ObjectId(recruiterId)
+      }
+    },
+    {
+      $group: {
+        _id: {
+          year: { $year: "$createdAt" },
+          week: { $week: "$createdAt" }
+        },
+        count: { $sum: 1 }
+      }
+    },
+    {
+      $sort: {
+        "_id.year": 1,
+        "_id.week": 1
+      }
     }
-  },
-  {
-    $group: {
-      _id: {
-        year: { $year: "$createdAt" },
-        week: { $week: "$createdAt" }
-      },
-      count: { $sum: 1 }
-    }
-  },
-  {
-    $sort: {
-      "_id.year": 1,
-      "_id.week": 1
-    }
-  }
-])
-        // 📊 APPLICATIONS PER DAY
-        
-     const applicationsPerWeek = await Application.aggregate([
-  {
-    $match: {
-      job: { $in: jobIds }
-    }
-  },
-  {
-    $group: {
-      _id: {
-        year: { $year: "$createdAt" },
-        week: { $week: "$createdAt" }
-      },
-      count: { $sum: 1 }
-    }
-  },
-  {
-    $sort: {
-      "_id.year": 1,
-      "_id.week": 1
-    }
-  }
-])
+  ])
+  // 📊 APPLICATIONS PER DAY
 
-    const stats = {
-        totalJobs: jobs.length,
-        totalApplications: applications.length,
-        pending: applications.filter(a => a.status === 'applied').length,
-        shortlisted: applications.filter(a => a.status === 'shortlisted').length
+  const applicationsPerWeek = await Application.aggregate([
+    {
+      $match: {
+        job: { $in: jobIds }
+      }
+    },
+    {
+      $group: {
+        _id: {
+          year: { $year: "$createdAt" },
+          week: { $week: "$createdAt" }
+        },
+        count: { $sum: 1 }
+      }
+    },
+    {
+      $sort: {
+        "_id.year": 1,
+        "_id.week": 1
+      }
+    }
+  ])
+
+  const stats = {
+    totalJobs: jobs.length,
+    totalApplications: applications.length,
+    pending: applications.filter(a => a.status === 'applied').length,
+    shortlisted: applications.filter(a => a.status === 'shortlisted').length
   }
-    res.json({
+  res.json({
     stats,
     recentApplications: applications.slice(0, 3),
     jobsPerWeek,
     applicationsPerWeek
-    })
+  })
 }
 
 
 const postJobPost = async (req, res, next) => {
   try {
-    const { title, jobLocation, jobMode, type,  experience, salaryRange, skills, describeRole, requirements, responsibilities, goodToHave } = req.body;
+    const { title, jobLocation, jobMode, type, experience, salaryRange, skills, describeRole, requirements, responsibilities, goodToHave } = req.body;
 
     const company = await Company.findOne({ recruiter: req.user.id });
 
@@ -144,7 +144,7 @@ const postJobPost = async (req, res, next) => {
       html
     );
 
-     // Send Email to Admin
+    // Send Email to Admin
     sendEmail(
       "softora.dev01@gmail.com",
       "New Job Posted",
@@ -162,90 +162,90 @@ const postJobPost = async (req, res, next) => {
 };
 
 
-const jobDetail = async(req, res) => {
-    const job = await Job.findById(req.params.id )
-    res.json({ job })
+const jobDetail = async (req, res) => {
+  const job = await Job.findById(req.params.id)
+  res.json({ job })
 }
 
-const getJobById = async(req, res) => {
-    const job = await Job.findById(req.params.id)
-    res.json({ job })
+const getJobById = async (req, res) => {
+  const job = await Job.findById(req.params.id)
+  res.json({ job })
 }
 
 const editJobPost = async (req, res, next) => {
-    try {
-        const { title, jobLocation, jobMode, type, experience, salaryRange, skills, describeRole, requirements, responsibilities, goodToHave } = req.body
-        await Job.findByIdAndUpdate({ _id: req.params.id }, {
-            title, jobLocation, jobMode, type, experience, salaryRange,
-            skills: skills.split(',').map(s => s.trim()),
-            describeRole,
-            requirements: requirements.split('\n').map(r => r.trim()).filter(item => item !== ""),
-            responsibilities: responsibilities.split('\n').map(r => r.trim()).filter(item => item !== ""),
-            goodToHave: goodToHave ? goodToHave.split('\n').map(g => g.trim()).filter(item => item !== "") : [],
-        })
-        res.json({message:'Edited successfully'})
-    } catch (err) {
-        next(err)
-    }
+  try {
+    const { title, jobLocation, jobMode, type, experience, salaryRange, skills, describeRole, requirements, responsibilities, goodToHave } = req.body
+    await Job.findByIdAndUpdate({ _id: req.params.id }, {
+      title, jobLocation, jobMode, type, experience, salaryRange,
+      skills: skills.split(',').map(s => s.trim()),
+      describeRole,
+      requirements: requirements.split('\n').map(r => r.trim()).filter(item => item !== ""),
+      responsibilities: responsibilities.split('\n').map(r => r.trim()).filter(item => item !== ""),
+      goodToHave: goodToHave ? goodToHave.split('\n').map(g => g.trim()).filter(item => item !== "") : [],
+    })
+    res.json({ message: 'Edited successfully' })
+  } catch (err) {
+    next(err)
+  }
 }
 
-const profile = async(req, res) => {
-    const user= await User.findById(req.user.id).populate('company')
-    res.json({user, company:user.company})
+const profile = async (req, res) => {
+  const user = await User.findById(req.user.id).populate('company')
+  res.json({ user, company: user.company })
 }
 
 const editProfile = async (req, res, next) => {
-    try {
-        const companyDetails = await Company.findOne({ recruiter: req.user.id })
-      res.json({ companyDetails })
-    } catch (err) {
-        next(err)
-    }
+  try {
+    const companyDetails = await Company.findOne({ recruiter: req.user.id })
+    res.json({ companyDetails })
+  } catch (err) {
+    next(err)
+  }
 }
 
 const editProfilePost = async (req, res, next) => {
-    try {
-        const { companyname, companyemail, website, description, username, useremail } = req.body
-        await Company.findOneAndUpdate({ recruiter: req.user.id }, {
-            name: companyname,
-            email: companyemail,
-            website,
-            description
-        })
-        await User.findOneAndUpdate({ _id: req.user.id }, {
-            name: username,
-            email: useremail
-        })
-        res.json({ message: "Profile updated successfully" })
-    } catch (err) {
-        next(err)
-    }
+  try {
+    const { companyname, companyemail, website, description, username, useremail } = req.body
+    await Company.findOneAndUpdate({ recruiter: req.user.id }, {
+      name: companyname,
+      email: companyemail,
+      website,
+      description
+    })
+    await User.findOneAndUpdate({ _id: req.user.id }, {
+      name: username,
+      email: useremail
+    })
+    res.json({ message: "Profile updated successfully" })
+  } catch (err) {
+    next(err)
+  }
 }
 
 
 const companyPost = async (req, res, next) => {
-    try {
-        const { name, location, industry, size, website, email, description } = req.body
-        const newCompany = await Company.create({
-          name, location, industry, size, website, email, logo: req.file.path, description, recruiter: req.user.id
-        })
-        await User.findByIdAndUpdate(req.user.id, {
-            company: newCompany._id
-        })
-        res.json({message:'Company added successfully'})
-    } catch (err) {
-        next(err)
-    }
+  try {
+    const { name, location, industry, size, website, email, description } = req.body
+    const newCompany = await Company.create({
+      name, location, industry, size, website, email, logo: req.file.path, description, recruiter: req.user.id
+    })
+    await User.findByIdAndUpdate(req.user.id, {
+      company: newCompany._id
+    })
+    res.json({ message: 'Company added successfully' })
+  } catch (err) {
+    next(err)
+  }
 }
 
 const deleteJob = async (req, res, next) => {
-    try {
-        const jobID = req.params.id
-        await Job.findByIdAndDelete(jobID)
-        res.json({message:'Deleted job successfully'})
-    } catch (err) {
-        next(err)
-    }
+  try {
+    const jobID = req.params.id
+    await Job.findByIdAndDelete(jobID)
+    res.json({ message: 'Deleted job successfully' })
+  } catch (err) {
+    next(err)
+  }
 }
 
 const applicantStatus = async (req, res, next) => {
@@ -254,42 +254,99 @@ const applicantStatus = async (req, res, next) => {
     const applicationId = req.params.id;
 
     const application = await Application.findById(applicationId)
-      .populate('applicant', 'email name');
+      .populate("applicant", "email name")
+      .populate("job", "title company");
 
     // safety check
     if (!application || !application.applicant) {
       return res.status(404).json({
-        message: "Application or applicant not found"
+        message: "Application or applicant not found",
       });
     }
 
     application.status = status;
     await application.save();
 
-    // send email
+    let subject = "";
+    let message = "";
+
+    // SHORTLIST MESSAGE
+    if (status === "shortlisted") {
+      subject = "Congratulations! You Have Been Shortlisted";
+
+      message = `
+Hello ${application.applicant.name},
+
+🎉 Congratulations!
+
+We are pleased to inform you that you have been shortlisted for the position of ${application.job.title}. Your profile and skills impressed our hiring team, and we are excited to move forward with your application.
+
+📩 Our team may contact you soon regarding the next stage of the hiring process.
+
+Thank you for your interest in joining ${application.job.company}. We look forward to connecting with you soon.
+
+Best regards,  
+${application.job.company}
+`;
+    }
+
+    // REJECT MESSAGE
+    else if (status === "rejected") {
+      subject = "Update Regarding Your Job Application";
+
+      message = `
+Hello ${application.applicant.name},
+
+Thank you for your interest in the position of ${application.job.title} and for taking the time to apply.
+
+After careful consideration, we regret to inform you that we have decided to move forward with other candidates whose qualifications more closely match our current requirements.
+
+This decision was not easy, as we received applications from many talented candidates. We truly appreciate your interest in our company and the effort you put into your application.
+
+We encourage you to continue applying for future opportunities that match your skills and experience. We wish you success in your career journey and future endeavors.
+
+Thank you once again for considering our company.
+
+Best regards,
+${application.job.company}
+`;
+    }
+
+    // SEND EMAIL
     await sendEmail(
       'softora.dev01@gmail.com',
+      subject,
+      message
+    );
 
-    )
-    res.json({ message: 'application status updated' });
+    res.json({
+      message: "Application status updated successfully",
+    });
+
   } catch (err) {
-    next(err);
+    console.log(err);
+
+    res.status(500).json({
+      message: "Server Error",
+    });
   }
 };
 
+
 const jobList = async (req, res, next) => {
-  try {
-    const { title } = req.query
-    let jobQuery = { recruiter: req.user.id }
-    if (title) {
-      jobQuery.title = { $regex: title, $options: 'i' }
+    try {
+      const { title } = req.query
+      let jobQuery = { recruiter: req.user.id }
+      if (title) {
+        jobQuery.title = { $regex: title, $options: 'i' }
+      }
+      const jobs = await Job.find(jobQuery)
+      res.json({ jobs })
+    } catch (err) {
+      next(err)
     }
-    const jobs = await Job.find(jobQuery)
-    res.json({ jobs })
-  } catch (err) {
-    next(err)
-  }
 }
+  
 
 const applicationGet = async (req, res, next) => {
   try {

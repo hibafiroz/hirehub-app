@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react'
 import Navbar from '../../components/Navbar'
 import API from '../../api/axios'
 import AnimatedSection from '../../components/AnimatedSection'
+import toast from 'react-hot-toast'
 
 function Contact() {
 
@@ -13,6 +14,7 @@ function Contact() {
         name: "", email: "", message: ""
     })
     const [formErr, setFormErr] = useState({})
+    const [sending, setSending] = useState(false)
 
     const handleChange = (e) => {
         const { name, value } = e.target
@@ -62,9 +64,17 @@ function Contact() {
             return
         }
 
-        const sendMessage = await API.post('/contact', formData)
-        alert('Message submitted successfully')
+        setSending(true)
 
+        try {
+            const sendMessage = await API.post('/contact', formData)
+            toast.success('Thanks! We will get back to you soon')
+            setFormData({ name: "", email: "", message: "" })
+        } catch (err) {
+            toast.success('Failed to send message!')
+        } finally {
+            setSending(false)
+        }
     }
 
     return (
@@ -146,7 +156,11 @@ function Contact() {
                             </div>
 
                             <button type="submit"
-                                className="w-full px-6 py-3 rounded-xl text-sm sm:text-base bg-teal-700/90 text-white font-medium hover:bg-teal-600/70 transition">                                Send Message
+                                disabled={sending}
+                  className={`w-full py-3 rounded-xl text-white transition font-medium 
+              ${sending ? "bg-teal-400 cursor-not-allowed" : "bg-teal-700/90 hover:bg-teal-400"}`}
+                >
+                  {sending ? "Sending..." : "Send Message"}
                             </button>
                         </form>
 

@@ -31,6 +31,7 @@ function Application() {
         const res = await API.get("/recruiter/application");
         const app = res.data.applications;
         setApplications(app);
+        console.log(app)
       } catch (err) {
         console.log(err.message)
       } finally {
@@ -58,6 +59,8 @@ function Application() {
       setSelectedApp((prev) =>
         prev?._id === id ? { ...prev, status } : prev
       );
+
+      console.log(selectedApp)
 
       toast.success("Status has been updated.");
 
@@ -151,13 +154,11 @@ function Application() {
                 {/* Resume */}
                 <div className="mb-4">
                   <p className="text-sm font-medium mb-1">Resume</p>
-                  <a
-                    href={selectedApp.resume}
-                    target="_blank"
-                    className="text-teal-600 underline text-sm"
-                  >
-                    View Resume
-                  </a>
+                  <button
+  onClick={() => window.open(selectedApp.resume, "_blank")}
+>
+  View Resume
+</button>
                 </div>
 
                 {/* Cover Letter */}

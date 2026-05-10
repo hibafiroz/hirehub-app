@@ -107,8 +107,8 @@ function ApplyNow() {
             <Loader />
           </div>
         ) : (
-            <div className="min-h-screen flex flex-col lg:flex-row justify-center items-center lg:items-start gap-8 px-4 sm:px-6 lg:px-10 w-full mx-auto">
-              
+          <div className="min-h-screen flex flex-col lg:flex-row justify-center items-center lg:items-start gap-8 px-4 sm:px-6 lg:px-10 w-full mx-auto">
+
             {/* JOB-INFO */}
             <div className="hidden lg:block w-full max-w-2xl lg:w-1/2 rounded-2xl lg:sticky top-28 p-4 sm:p-8">
               <h1 className="text-3xl sm:text-4xl text-slate-700 font-semibold leading-snug">
@@ -123,7 +123,16 @@ function ApplyNow() {
               </p>
               <p className="text-slate-700 mt-6 text-lg">Skills</p>
               <p className="text-slate-600 mt-1 text-sm">
-                {job.skills}
+                <div className="flex flex-wrap gap-2">
+                  {job.skills.map((skill, index) => (
+                    <span
+                      key={index}
+                      className="px-3 py-1 bg-gray-200 text-sm rounded-full"
+                    >
+                      {skill}
+                    </span>
+                  ))}
+                </div>
               </p>
               <p className="text-slate-700 mt-6 text-lg">Experience</p>
               <p className="text-slate-600 mt-1 text-sm">
