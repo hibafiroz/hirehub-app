@@ -12,10 +12,7 @@ const path = require('path');
 
 //Cors
 app.use(cors({
- origin: [
-    'https://hirehub-app-psi.vercel.app',
-    'http://localhost:5173'
-  ],
+ origin: true,
   credentials: true
 }))
 
