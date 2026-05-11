@@ -10,6 +10,8 @@ const { errorHandlingMiddleware } = require('./Middleware/errorMiddleware')
 const PORT = process.env.PORT
 const path = require('path');
 
+app.set('trust proxy', 1)
+
 //Cors
 app.use(cors({
  origin: true,
