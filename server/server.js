@@ -14,7 +14,7 @@ app.set('trust proxy', 1)
 
 //Cors
 app.use(cors({
- origin: true,
+ origin: 'https://hirehub-app-psi.vercel.app',
   credentials: true
 }))
 
