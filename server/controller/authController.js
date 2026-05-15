@@ -26,7 +26,6 @@ const registerPost = async (req, res, next) => {
     res.cookie("jobportaltoken", token, {
       httpOnly: true,
       secure: true,
-      domain: ".vercel.app",
       sameSite: "none",
       maxAge: 24 * 60 * 60 * 1000
     });
@@ -81,7 +80,6 @@ const login = async (req, res, next) => {
       httpOnly: true,
       secure: true,
       sameSite: "none",
-      domain: ".vercel.app",
       maxAge: 24 * 60 * 60 * 1000
     });
 
@@ -105,7 +103,6 @@ const logout = (req, res) => {
   res.clearCookie("jobportaltoken", {
     httpOnly: true,
     sameSite: "none",
-    domain: ".vercel.app",
     secure: true
   });
   res.json({ message: "Logged out successfully" })
